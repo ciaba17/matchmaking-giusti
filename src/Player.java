@@ -1,9 +1,9 @@
 public class Player {
     private String name = "player";
-    private float level = 0;
+    private int level = 0;
     private boolean searchingForGame = false;
 
-    public Player(String name, float level) {
+    public Player(String name, int level) {
         this.name = name;
         this.level = level;
     }
@@ -16,11 +16,11 @@ public class Player {
         this.name = name;
     }
 
-    public float getLevel() {
+    public int getLevel() {
         return level;
     }
 
-    public void setLevel(float level) {
+    public void setLevel(int level) {
         this.level = level;
     }
 

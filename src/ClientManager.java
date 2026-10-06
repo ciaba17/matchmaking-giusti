@@ -1,22 +1,30 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ClientManager implements Runnable {
     Socket socket;
+    ArrayList<PlayerData> waitingPlayers;
 
-    public ClientManager(Socket socket) {
+    public ClientManager(Socket socket, ArrayList<PlayerData> waitingPlayers) {
         this.socket = socket;
-
+        this.waitingPlayers = waitingPlayers;
     }
 
     @Override
     public void run() {
         try {
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter output = new PrintWriter((new OutputStreamWriter(socket.getOutputStream())));
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
-            String request = input.readLine();
-            System.out.println(request);
+            String name = input.readUTF();
+            int level = input.readInt();
+
+            PlayerData p = new PlayerData(name, level, socket);
+            waitingPlayers.add(p);
+
+            System.out.println(name);
+            System.out.println(level);
 
             socket.close();
         } catch (IOException e) {
