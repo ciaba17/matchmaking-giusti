@@ -25,7 +25,6 @@ public class PlayerData {
     }
     public synchronized void matchFound(Squad squad) {
         this.matched = true;
-        squad.getPlayers().remove(this);
         this.squadToNotify = squad;
         notify();
     }

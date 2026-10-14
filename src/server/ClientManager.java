@@ -30,24 +30,29 @@ public class ClientManager implements Runnable {
 
             p = new PlayerData(socket, name, level, score);
 
-            synchronized (waitingPlayers) {waitingPlayers.add(p);}
+            synchronized (waitingPlayers) {
+                waitingPlayers.add(p);
+                synchronized (System.out) {
+                    System.out.println("[JOIN] " + name + " (lvl " + level + ", rating " + rating + ") | Queue: " + waitingPlayers.size());
+                }
+            }
 
             p.waitForMatch();
 
+            StringBuilder names = new StringBuilder();
             for (PlayerData squadPlayer : p.getSquadToNotify().getPlayers()) {
-                output.writeUTF(squadPlayer.getName());
-                output.flush(); // Sends the data immediately
+                if (names.length() > 0) names.append(", ");
+                names.append(squadPlayer.getName());
             }
 
+            // Send the squad name and the player list
+            output.writeUTF(p.getSquadToNotify().getName());
+            output.writeUTF(names.toString());
+            output.flush();
 
             socket.close();
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println("[ERR] Client disconnected: " + e.getMessage());
         }
-    }
-
-
-    public void sendDataToSquad() {
-
     }
 }

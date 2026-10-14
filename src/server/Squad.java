@@ -4,7 +4,13 @@ import java.util.ArrayList;
 
 public class Squad {
     private ArrayList<PlayerData> players = new ArrayList<PlayerData>();
+    private String name;
 
+    public Squad(String name) {
+        this.name = name;
+    }
+
+    public String getName() { return name; }
 
     public double getSquadScore() {
         // Sum all squad's players

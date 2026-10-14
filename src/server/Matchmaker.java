@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Matchmaker implements Runnable {
     ArrayList<PlayerData> waitingPlayers;
+    int matchCount = 0;
 
     public Matchmaker(ArrayList<PlayerData> waitingPlayers) {
         this.waitingPlayers = waitingPlayers;
@@ -15,25 +16,24 @@ public class Matchmaker implements Runnable {
             matchmaking();
             try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
         }
-
     }
 
-
-
     private int matchmaking() {
-        if (waitingPlayers.size() < Config.CANDIDATE_POOL_SIZE) return 1;
-
         ArrayList<PlayerData> candidatePool = new ArrayList<>();
+        synchronized (waitingPlayers) {
+            if (waitingPlayers.size() < Config.PLAYERS_PER_MATCH) return 1;
 
-        for (int i = 0; i < Config.CANDIDATE_POOL_SIZE; i++) {
-            candidatePool.add(waitingPlayers.get(i));
+            // Use a smaller pool when there are not enough extra players
+            int poolSize = Math.min(waitingPlayers.size(), Config.CANDIDATE_POOL_SIZE);
+            for (int i = 0; i < poolSize; i++) {
+                candidatePool.add(waitingPlayers.remove(0));
+            }
         }
-        synchronized (waitingPlayers) { waitingPlayers.removeAll(candidatePool); }
 
         ArrayList<Squad> squads = new ArrayList<>();
 
         for (int i = 0; i < Config.SQUADS_PER_MATCH; i++) {
-            squads.add(new Squad());
+            squads.add(new Squad("Squad " + (char) ('A' + i)));
         }
 
         // Sort the pool from low to high
@@ -47,7 +47,7 @@ public class Matchmaker implements Runnable {
         int low = 0;
         int high = candidatePool.size() - 1;
 
-        for (int i = 0; i < candidatePool.size(); i++) {
+        for (int i = 0; i < Config.PLAYERS_PER_MATCH; i++) {
             // Alternate low and high score player
             PlayerData player;
 
@@ -61,7 +61,7 @@ public class Matchmaker implements Runnable {
 
             for (Squad squad : squads) {
                 if (squad.getPlayerCount() >= Config.PLAYERS_PER_SQUAD)
-                    break;
+                    continue;
 
                 if (weakestSquad == null ||
                     squad.getSquadScore() < weakestSquad.getSquadScore() ||
@@ -74,8 +74,28 @@ public class Matchmaker implements Runnable {
             weakestSquad.addPlayer(player);
         }
 
-        Match match = new Match(squads);
+        synchronized (waitingPlayers) {
+            waitingPlayers.addAll(candidatePool.subList(low, high + 1));
+        }
 
+        // Print each match with its squads
+        matchCount++;
+        synchronized (System.out) {
+            System.out.println();
+            System.out.println("========== MATCH #" + matchCount + " ==========");
+            for (Squad squad : squads) {
+                StringBuilder names = new StringBuilder();
+                for (PlayerData player : squad.getPlayers()) {
+                    if (names.length() > 0) names.append(", ");
+                    names.append(player.getName());
+                }
+                System.out.println(" " + squad.getName() + " : " + names);
+            }
+            System.out.println("================================");
+            System.out.println();
+        }
+
+        Match match = new Match(squads);
         new Thread(match).start();
         return 0;
     }

@@ -2,7 +2,7 @@ package server;
 
 import java.util.ArrayList;
 
-public class Match implements Runnable{
+public class Match implements Runnable {
     ArrayList<Squad> squads;
 
     public Match(ArrayList<Squad> squads) {
