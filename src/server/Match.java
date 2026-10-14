@@ -1,7 +1,6 @@
-import java.net.Socket;
+package server;
+
 import java.util.ArrayList;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Match implements Runnable{
     ArrayList<Squad> squads;
@@ -14,7 +13,7 @@ public class Match implements Runnable{
     public void run() {
         for (Squad squad : squads) {
             for (PlayerData player : squad.getPlayers()) {
-
+                player.matchFound(squad);
             }
         }
     }

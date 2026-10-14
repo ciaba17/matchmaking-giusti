@@ -1,18 +1,20 @@
+package server;
+
 import java.util.ArrayList;
 
 public class Matchmaker implements Runnable {
-    ArrayList<Match> currentMatches;
     ArrayList<PlayerData> waitingPlayers;
 
-    public Matchmaker(ArrayList<Match> currentMatches, ArrayList<PlayerData> waitingPlayers) {
-        this.currentMatches = currentMatches;
+    public Matchmaker(ArrayList<PlayerData> waitingPlayers) {
         this.waitingPlayers = waitingPlayers;
     }
 
     @Override
     public void run() {
-        while (matchmaking() != 0) {};
-
+        while (true) {
+            matchmaking();
+            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+        }
 
     }
 
@@ -26,6 +28,7 @@ public class Matchmaker implements Runnable {
         for (int i = 0; i < Config.CANDIDATE_POOL_SIZE; i++) {
             candidatePool.add(waitingPlayers.get(i));
         }
+        synchronized (waitingPlayers) { waitingPlayers.removeAll(candidatePool); }
 
         ArrayList<Squad> squads = new ArrayList<>();
 
@@ -64,6 +67,7 @@ public class Matchmaker implements Runnable {
                     squad.getSquadScore() < weakestSquad.getSquadScore() ||
                     (squad.getSquadScore() == weakestSquad.getSquadScore() &&
                     squad.getPlayerCount() < weakestSquad.getPlayerCount())) {
+
                         weakestSquad = squad;
                 }
             }

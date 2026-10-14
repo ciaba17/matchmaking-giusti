@@ -1,3 +1,7 @@
+package client;
+
+import server.Config;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -21,6 +25,10 @@ public class Client implements Runnable {
         output.flush(); // Sends the data immediately
         System.out.println("Player data sent");
 
+        System.out.println("matchmaking...");
+
+        System.out.println(input.readUTF());
+
         socket.close();
     }
 
@@ -35,14 +43,14 @@ public class Client implements Runnable {
         try {
             start();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     private static String generateName() {
         String[] names = {
-            "Shadow", "Ghost", "Viper", "Ninja", "Dragon",
-            "Sniper", "Reaper", "Wolf", "Titan", "Raven"
+                "Shadow", "Ghost", "Viper", "Ninja", "Dragon",
+                "Sniper", "Reaper", "Wolf", "Titan", "Raven"
         };
 
         int random = (int) (Math.random() * names.length);

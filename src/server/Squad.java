@@ -1,7 +1,9 @@
+package server;
+
 import java.util.ArrayList;
 
 public class Squad {
-    private ArrayList<PlayerData> players;
+    private ArrayList<PlayerData> players = new ArrayList<PlayerData>();
 
 
     public double getSquadScore() {

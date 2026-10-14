@@ -1,3 +1,7 @@
+package client;
+
+import server.Config;
+
 public class Player {
     private String name = "player";
     private int level = 0;

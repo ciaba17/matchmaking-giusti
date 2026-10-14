@@ -1,3 +1,5 @@
+package server;
+
 import java.net.Socket;
 
 public class PlayerData {
@@ -6,12 +8,26 @@ public class PlayerData {
     private int level;
     private double matchmakingScore;
 
+    private boolean matched = false;
+    private Squad squadToNotify;
+
+
 
     PlayerData(Socket socket, String name, int level, double matchmakingScore) {
         this.socket = socket;
         this.name = name;
         this.level = level;
         this.matchmakingScore = matchmakingScore;
+    }
+
+    public synchronized void waitForMatch() throws InterruptedException {
+        while (!matched) wait();
+    }
+    public synchronized void matchFound(Squad squad) {
+        this.matched = true;
+        squad.getPlayers().remove(this);
+        this.squadToNotify = squad;
+        notify();
     }
 
     public Socket getSocket() {
@@ -41,4 +57,13 @@ public class PlayerData {
     public double getMatchmakingScore() { return matchmakingScore; }
 
     public void setMatchmakingScore(double matchmakingScore) { this.matchmakingScore = matchmakingScore; }
+
+    public Squad getSquadToNotify() {
+        return squadToNotify;
+    }
+
+    public void setSquadToNotify(Squad squadToNotify) {
+        this.squadToNotify = squadToNotify;
+
+    }
 }
