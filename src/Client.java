@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class Client implements Runnable {
-    private Player player = new Player("player", 1);
+    private Player player = new Player("player", 1, 100);
 
     public static void main(String[] args) throws Exception { // For base client running
         Client client = new Client();
@@ -17,6 +17,7 @@ public class Client implements Runnable {
 
         output.writeUTF(player.getName());
         output.writeInt(player.getLevel());
+        output.writeInt(player.getRating());
         output.flush(); // Sends the data immediately
         System.out.println("Player data sent");
 
@@ -25,10 +26,11 @@ public class Client implements Runnable {
 
     @Override
     public void run() { // For running multiple clients during the testing
-        int level = (int) (Math.random() * 99) + 1;
         String name = generateName();
+        int level = (int) (Math.random() * Config.MAX_LEVEL) + 1;
+        int rating = (int) (Math.random() * Config.MAX_RATING) + 1;
 
-        player = new Player(name, level);
+        player = new Player(name, level, rating);
 
         try {
             start();

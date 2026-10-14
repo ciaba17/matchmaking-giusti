@@ -19,12 +19,16 @@ public class ClientManager implements Runnable {
 
             String name = input.readUTF();
             int level = input.readInt();
+            int rating = input.readInt();
 
-            PlayerData p = new PlayerData(name, level, socket);
-            waitingPlayers.add(p);
+            PlayerData p = new PlayerData(socket, name, level, rating);
+
+            synchronized (waitingPlayers) {waitingPlayers.add(p);}
 
             System.out.println(name);
             System.out.println(level);
+            System.out.println(rating);
+
 
             socket.close();
         } catch (IOException e) {

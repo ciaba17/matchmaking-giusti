@@ -1,11 +1,19 @@
 public class Player {
     private String name = "player";
     private int level = 0;
-    private boolean searchingForGame = false;
+    private int rating = 0;
+    private double matchmakingScore = 0;
 
-    public Player(String name, int level) {
+
+    public Player(String name, int level, int rating) {
         this.name = name;
         this.level = level;
+        this.rating = rating;
+
+        double normalizedLevel = level / 100.0;
+        double normalizedRating = rating / 3000.0;
+
+        matchmakingScore = Config.LEVEL_WEIGHT * normalizedLevel + Config.RATING_WEIGHT * normalizedRating;
     }
 
     public String getName() {
@@ -24,11 +32,19 @@ public class Player {
         this.level = level;
     }
 
-    public boolean isSearchingForGame() {
-        return searchingForGame;
+    public int getRating() {
+        return rating;
     }
 
-    public void setSearchingForGame(boolean searchingForGame) {
-        this.searchingForGame = searchingForGame;
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public double getMatchmakingScore() {
+        return matchmakingScore;
+    }
+
+    public void setMatchmakingScore(float matchmakingScore) {
+        this.matchmakingScore = matchmakingScore;
     }
 }
